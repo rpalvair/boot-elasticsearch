@@ -12,3 +12,6 @@ eureka:
 spring:
   application:
     name: elasticsearch
+
+cxf:
+  path: /api

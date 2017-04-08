@@ -1,4 +1,4 @@
-package com.palvair.elasticsearch;
+package com.palvair.elasticsearch.infrastructure;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.Bus;
@@ -20,7 +20,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.palvair.elasticsearch"})
 @EnableEurekaClient
 public class Application {
 

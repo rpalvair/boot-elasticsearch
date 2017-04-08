@@ -1,4 +1,4 @@
-package com.palvair.elasticsearch.api;
+package com.palvair.elasticsearch.presentation;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiResponse;
@@ -25,7 +25,8 @@ public class SeachResource {
                     message = "Retourne le résultat de la recherche")
     )
     public Response find() {
-        return Response.ok()
-                .build();
+        return Response.ok(
+                new SearchResult("Voici le résultat")
+        ).build();
     }
 }
