@@ -15,3 +15,6 @@ spring:
 
 cxf:
   path: /api
+  jaxrs:
+    component-scan: true
+    classes-scan-packages: com.palvair.elasticsearch.presentation
