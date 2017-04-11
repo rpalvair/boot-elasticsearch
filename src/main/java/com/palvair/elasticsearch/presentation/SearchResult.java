@@ -1,21 +1,31 @@
 package com.palvair.elasticsearch.presentation;
 
 
-public class SearchResult {
+import java.util.Collections;
+import java.util.List;
 
-    private String content;
+public class SearchResult<T> {
 
+    private final List<T> list;
 
-    public SearchResult(final String content) {
-        this.content = content;
-    }
 
     public SearchResult() {
         //for jackson
+        this.list = Collections.emptyList();
     }
 
-    public String getContent() {
-        return content;
+    public SearchResult(List<T> list) {
+        this.list = list;
     }
 
+    public List<T> getList() {
+        return list;
+    }
+
+    @Override
+    public String toString() {
+        return "SearchResult{" +
+                "list=" + list +
+                '}';
+    }
 }

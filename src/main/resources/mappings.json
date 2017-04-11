@@ -1,0 +1,14 @@
+{
+  "mappings": {
+    "user": {
+      "properties": {
+        "nom": {
+          "type": "keyword"
+        },
+        "prenom": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}

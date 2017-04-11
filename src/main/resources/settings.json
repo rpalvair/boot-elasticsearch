@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "french": {
+          "type":      "standard",
+          "stopwords": "_french_"
+        }
+      }
+    }
+  }
+}
