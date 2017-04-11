@@ -37,7 +37,7 @@ public class IndexServiceIT {
 
     @Test
     public void shoud() throws IOException, InterruptedException {
-        final SearchResult<User> searchResult = searchService.search("palvair");
+        final SearchResult<User> searchResult = searchService.searchExactly("palvair");
         LOGGER.debug("searchResult = {}", searchResult);
     }
 

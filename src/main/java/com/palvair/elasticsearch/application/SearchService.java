@@ -33,7 +33,7 @@ public class SearchService {
         this.elasticsearchTemplate = elasticsearchTemplate;
     }
 
-    public SearchResult<User> search(final String value) {
+    public SearchResult<User> searchExactly(final String value) {
 
         final BoolQueryBuilder query = boolQuery().must(
                 boolQuery().should(matchQuery("nom", value))

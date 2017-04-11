@@ -18,8 +18,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Service
-@Path("/search")
-@Api(value = "/search", description = "Service de recherche")
+@Path("/searchExactly")
+@Api(value = "/searchExactly", description = "Service de recherche")
 public class SeachResource {
 
     @Autowired
@@ -46,7 +46,7 @@ public class SeachResource {
     )
     public Response find(@QueryParam("value") final String value) {
         return Response.ok(
-                searchService.search(value)
+                searchService.searchExactly(value)
         ).build();
     }
 }
