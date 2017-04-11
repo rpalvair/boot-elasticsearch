@@ -22,14 +22,14 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 
 @Service
-public class SearchService {
+public class UserSearchService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserSearchService.class);
 
     private final ElasticsearchTemplate elasticsearchTemplate;
 
     @Autowired
-    public SearchService(final ElasticsearchTemplate elasticsearchTemplate) {
+    public UserSearchService(final ElasticsearchTemplate elasticsearchTemplate) {
         this.elasticsearchTemplate = elasticsearchTemplate;
     }
 

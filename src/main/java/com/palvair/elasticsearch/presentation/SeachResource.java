@@ -1,6 +1,6 @@
 package com.palvair.elasticsearch.presentation;
 
-import com.palvair.elasticsearch.application.SearchService;
+import com.palvair.elasticsearch.application.UserSearchService;
 import com.palvair.elasticsearch.presentation.error.EntityNotFoundException;
 import com.palvair.elasticsearch.presentation.error.SearchBadRequest;
 import com.palvair.elasticsearch.presentation.error.SearchError;
@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response;
 public class SeachResource {
 
     @Autowired
-    private SearchService searchService;
+    private UserSearchService userSearchService;
 
     @GET
     @Path("/")
@@ -46,7 +46,7 @@ public class SeachResource {
     )
     public Response find(@QueryParam("value") final String value) {
         return Response.ok(
-                searchService.searchExactly(value)
+                userSearchService.searchExactly(value)
         ).build();
     }
 }

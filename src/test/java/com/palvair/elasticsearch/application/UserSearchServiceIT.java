@@ -20,14 +20,14 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class}, webEnvironment = DEFINED_PORT)
 @ActiveProfiles("test")
-public class IndexServiceIT {
+public class UserSearchServiceIT {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IndexServiceIT.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserSearchServiceIT.class);
     @Autowired
     private IndexService indexService;
 
     @Autowired
-    private SearchService searchService;
+    private UserSearchService userSearchService;
 
 
     @Before
@@ -37,7 +37,7 @@ public class IndexServiceIT {
 
     @Test
     public void shoud() throws IOException, InterruptedException {
-        final SearchResult<User> searchResult = searchService.searchExactly("palvair");
+        final SearchResult<User> searchResult = userSearchService.searchExactly("palvair");
         LOGGER.debug("searchResult = {}", searchResult);
     }
 
