@@ -1,5 +1,6 @@
 package com.palvair.elasticsearch.application;
 
+import com.palvair.elasticsearch.domain.User;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +24,21 @@ public class IndexService {
     }
 
     public void createIndex() throws IOException, InterruptedException {
-        client.admin().indices().prepareCreate(INDEX)
+        client.admin()
+                .indices()
+                .prepareCreate(INDEX)
                 .addMapping(TYPE, new ClassPathResource("mappings.json").getPath())
                 .setSettings(new ClassPathResource("settings.json").getPath());
+    }
 
+    public void addUser(final User user) throws IOException, InterruptedException {
         final XContentBuilder json = jsonBuilder()
                 .startObject()
-                .field("prenom", "ruddy")
-                .field("nom", "palvair")
+                .field("prenom", user.getPrenom())
+                .field("nom", user.getNom())
                 .endObject();
 
-        client.prepareIndex("user", "user")
+        client.prepareIndex(INDEX, TYPE)
                 .setSource(json)
                 .get();
 

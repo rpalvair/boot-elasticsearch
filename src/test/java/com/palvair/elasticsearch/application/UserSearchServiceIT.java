@@ -6,15 +6,15 @@ import com.palvair.elasticsearch.presentation.SearchResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 
 @RunWith(SpringRunner.class)
@@ -22,13 +22,11 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ActiveProfiles("test")
 public class UserSearchServiceIT {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserSearchServiceIT.class);
     @Autowired
     private IndexService indexService;
 
     @Autowired
     private UserSearchService userSearchService;
-
 
     @Before
     public void before() throws IOException, InterruptedException {
@@ -36,9 +34,15 @@ public class UserSearchServiceIT {
     }
 
     @Test
-    public void shoud() throws IOException, InterruptedException {
-        final SearchResult<User> searchResult = userSearchService.searchExactly("palvair");
-        LOGGER.debug("searchResult = {}", searchResult);
+    public void should_user_in_index_and_retrieve_it() throws IOException, InterruptedException {
+        final String nom = "palvair";
+        indexService.addUser(new User(nom, "ruddy"));
+        final SearchResult<User> searchResult = userSearchService.searchExactly(nom);
+        assertThat(searchResult).isNotNull();
+        final List<User> users = searchResult.getList();
+        assertThat(users).isNotEmpty()
+                .extracting(User::getNom)
+                .contains(nom);
     }
 
 
