@@ -3,7 +3,14 @@
     "user": {
       "properties": {
         "nom": {
-          "type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "autocomplete": {
+              "type": "text",
+              "analyzer": "autocomplete",
+              "search_analyzer": "standard"
+            }
+          }
         },
         "prenom": {
           "type": "keyword"
