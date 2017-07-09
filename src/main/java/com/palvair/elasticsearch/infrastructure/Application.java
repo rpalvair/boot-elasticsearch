@@ -1,6 +1,5 @@
 package com.palvair.elasticsearch.infrastructure;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,8 +20,4 @@ public class Application {
         return new Swagger2Feature();
     }
 
-    @Bean
-    public JacksonJsonProvider jacksonJsonProvider() {
-        return new JacksonJsonProvider();
-    }
 }

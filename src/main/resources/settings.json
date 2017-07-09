@@ -1,27 +1,36 @@
 {
-  "settings": {
     "analysis": {
+      "filter": {
+        "autocomplete_filter": {
+          "type": "edge_ngram",
+          "min_gram": 1,
+          "max_gram": 20
+        }
+      },
       "analyzer": {
         "french": {
-          "type":      "standard",
+          "type": "standard",
           "stopwords": "_french_"
         },
         "autocomplete": {
-          "type":      "custom",
-          "tokenizer": "standard",
+          "type": "custom",
+          "tokenizer": "keyword",
           "filter": [
             "lowercase",
+            "asciifolding",
+            "word_delimiter",
             "autocomplete_filter"
           ]
-        }
-      },
-      "filter": {
-        "autocomplete_filter": {
-          "type":     "edge_ngram",
-          "min_gram": 1,
-          "max_gram": 20
+        },
+        "query_autocomplete": {
+          "type": "custom",
+          "tokenizer": "keyword",
+          "filter": [
+            "lowercase",
+            "asciifolding",
+            "word_delimiter"
+          ]
         }
       }
     }
   }
-}

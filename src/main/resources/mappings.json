@@ -1,21 +1,21 @@
 {
-  "mappings": {
-    "user": {
-      "properties": {
-        "nom": {
-          "type": "keyword",
-          "fields": {
-            "autocomplete": {
-              "type": "text",
-              "analyzer": "autocomplete",
-              "search_analyzer": "standard"
-            }
+  "user": {
+    "properties": {
+      "nom": {
+        "type": "string",
+        "analyzer": "keyword",
+        "fields": {
+          "autocomplete": {
+            "type": "string",
+            "analyzer": "autocomplete"
           }
-        },
-        "prenom": {
-          "type": "keyword"
         }
+      },
+      "prenom": {
+        "type": "string",
+        "analyzer": "keyword"
       }
     }
   }
 }
+

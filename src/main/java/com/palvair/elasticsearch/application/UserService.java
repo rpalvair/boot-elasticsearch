@@ -4,9 +4,9 @@ import com.palvair.elasticsearch.domain.User;
 import com.palvair.elasticsearch.presentation.SearchResult;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
@@ -22,14 +22,12 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 
 @Service
-public class UserSearchService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserSearchService.class);
+public class UserService {
 
     private final ElasticsearchTemplate elasticsearchTemplate;
 
     @Autowired
-    public UserSearchService(final ElasticsearchTemplate elasticsearchTemplate) {
+    public UserService(final ElasticsearchTemplate elasticsearchTemplate) {
         this.elasticsearchTemplate = elasticsearchTemplate;
     }
 
@@ -41,8 +39,33 @@ public class UserSearchService {
         );
 
         final NativeSearchQuery builder = new NativeSearchQueryBuilder()
-                .withIndices("user")
-                .withTypes("user")
+                .withIndices(IndexName.USER.getName())
+                .withTypes(TypeName.USER.getName())
+                .withQuery(query).build();
+
+        return elasticsearchTemplate.query(builder, this::extractResults);
+    }
+
+    public SearchResult<User> searchApproximately(final String value) {
+
+        final BoolQueryBuilder query = boolQuery().must(
+                boolQuery().should(matchQuery("nom.autocomplete", value).analyzer("query_autocomplete"))
+        );
+
+        final NativeSearchQuery builder = new NativeSearchQueryBuilder()
+                .withIndices(IndexName.USER.getName())
+                .withTypes(TypeName.USER.getName())
+                .withQuery(query).build();
+
+        return elasticsearchTemplate.query(builder, this::extractResults);
+    }
+
+    public SearchResult<User> getAll() {
+        final MatchAllQueryBuilder query = QueryBuilders.matchAllQuery();
+
+        final NativeSearchQuery builder = new NativeSearchQueryBuilder()
+                .withIndices(IndexName.USER.getName())
+                .withTypes(TypeName.USER.getName())
                 .withQuery(query).build();
 
         return elasticsearchTemplate.query(builder, this::extractResults);
@@ -59,4 +82,6 @@ public class UserSearchService {
     private User getMapSearchResultFunction(final Map<String, Object> map) {
         return new User((String) map.get("nom"), (String) map.get("prenom"));
     }
+
+
 }

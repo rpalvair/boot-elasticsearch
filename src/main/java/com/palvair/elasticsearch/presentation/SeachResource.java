@@ -1,12 +1,15 @@
 package com.palvair.elasticsearch.presentation;
 
-import com.palvair.elasticsearch.application.UserSearchService;
+import com.palvair.elasticsearch.application.UserService;
 import com.palvair.elasticsearch.presentation.error.EntityNotFoundException;
 import com.palvair.elasticsearch.presentation.error.SearchBadRequest;
 import com.palvair.elasticsearch.presentation.error.SearchError;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +25,9 @@ import javax.ws.rs.core.Response;
 @Api(value = "/searchExactly", description = "Service de recherche")
 public class SeachResource {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SeachResource.class);
     @Autowired
-    private UserSearchService userSearchService;
+    private UserService userService;
 
     @GET
     @Path("/")
@@ -45,8 +49,15 @@ public class SeachResource {
             }
     )
     public Response find(@QueryParam("value") final String value) {
+        if (StringUtils.isBlank(value)) {
+            final String message = "Value should not be blank";
+            LOGGER.error(message);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new SearchBadRequest())
+                    .build();
+        }
         return Response.ok(
-                userSearchService.searchExactly(value)
+                userService.searchExactly(value)
         ).build();
     }
 }

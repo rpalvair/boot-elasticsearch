@@ -1,21 +1,24 @@
 package com.palvair.elasticsearch.application;
 
-import com.palvair.elasticsearch.domain.User;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @Service
 public class IndexService {
 
-    private static final String INDEX = "user";
-    private static final String TYPE = "user";
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndexService.class);
     private final Client client;
 
     @Autowired
@@ -23,25 +26,38 @@ public class IndexService {
         this.client = client;
     }
 
-    public void createIndex() throws IOException, InterruptedException {
-        client.admin()
+    public void createIndex(final IndexName indexName, final TypeName typeName) throws IOException, InterruptedException {
+        final URI mappingsUri = new ClassPathResource("mappings.json").getURI();
+        final String mapping = new String(Files.readAllBytes(Paths.get(mappingsUri)));
+        final URI settingsUri = new ClassPathResource("settings.json").getURI();
+        final String setting = new String(Files.readAllBytes(Paths.get(settingsUri)));
+        final CreateIndexResponse createIndexResponse = client.admin()
                 .indices()
-                .prepareCreate(INDEX)
-                .addMapping(TYPE, new ClassPathResource("mappings.json").getPath())
-                .setSettings(new ClassPathResource("settings.json").getPath());
-    }
-
-    public void addUser(final User user) throws IOException, InterruptedException {
-        final XContentBuilder json = jsonBuilder()
-                .startObject()
-                .field("prenom", user.getPrenom())
-                .field("nom", user.getNom())
-                .endObject();
-
-        client.prepareIndex(INDEX, TYPE)
-                .setSource(json)
+                .prepareCreate(indexName.getName())
+                .addMapping(typeName.getName(), mapping)
+                .setSettings(setting)
                 .get();
 
-        Thread.sleep(5000);
+        LOGGER.debug("response = {}", createIndexResponse);
+        LOGGER.debug("Indice {} created", indexName.getName());
+    }
+
+    public void clear(final IndexName indexName) throws InterruptedException {
+        final DeleteIndexResponse deleteIndexResponse = client.admin()
+                .indices()
+                .prepareDelete(indexName.getName())
+                .get();
+
+        LOGGER.debug("response {}", deleteIndexResponse);
+
+        LOGGER.debug("Indice {} deleted", indexName.getName());
+    }
+
+    public boolean indexExists(final IndexName indexName) {
+        return client.admin()
+                .indices()
+                .exists(new IndicesExistsRequest(indexName.getName()))
+                .actionGet()
+                .isExists();
     }
 }
