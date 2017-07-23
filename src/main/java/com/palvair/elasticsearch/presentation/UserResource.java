@@ -21,11 +21,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Service
-@Path("/searchExactly")
-@Api(value = "/searchExactly", description = "Service de recherche")
-public class SeachResource {
+@Path("/users")
+@Api(value = "/users", description = "Service de recherche des utilisateurs")
+public class UserResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SeachResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserResource.class);
     @Autowired
     private UserService userService;
 
