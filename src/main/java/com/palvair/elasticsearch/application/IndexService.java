@@ -42,13 +42,13 @@ public class IndexService {
         LOGGER.debug("Indice {} created", indexName.getName());
     }
 
-    public void clear(final IndexName indexName) throws InterruptedException {
+    public void deleteIndex(final IndexName indexName) throws InterruptedException {
         final DeleteIndexResponse deleteIndexResponse = client.admin()
                 .indices()
                 .prepareDelete(indexName.getName())
                 .get();
 
-        LOGGER.debug("response {}", deleteIndexResponse);
+        LOGGER.debug("response {}", deleteIndexResponse.getContext());
 
         LOGGER.debug("Indice {} deleted", indexName.getName());
     }
