@@ -20,11 +20,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class}, webEnvironment = NONE)
 @ActiveProfiles("test")
-@Transactional
 public class UserServiceIT {
 
-    @Autowired
-    private IndexService indexService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -33,9 +30,7 @@ public class UserServiceIT {
 
     @Test
     public void should_find_user_by_name_in_index_and_retrieve_it() throws IOException, InterruptedException {
-        initIndex();
-        userIndexer.fillIndex();
-
+        userIndexer.indexUsers();
         final SearchResult<User> all = userService.getAll();
         assertThat(all)
                 .isNotNull();
@@ -55,9 +50,7 @@ public class UserServiceIT {
 
     @Test
     public void should_find_user_by_prenom_in_index_and_retrieve_it() throws IOException, InterruptedException {
-        initIndex();
-        userIndexer.fillIndex();
-
+        userIndexer.indexUsers();
         final SearchResult<User> all = userService.getAll();
         assertThat(all)
                 .isNotNull();
@@ -82,8 +75,7 @@ public class UserServiceIT {
 
     @Test
     public void should_find_user_approximately_by_nom_in_index_and_retrieve_it() throws IOException, InterruptedException {
-        initIndex();
-        userIndexer.fillIndex();
+        userIndexer.indexUsers();
 
         final SearchResult<User> all = userService.getAll();
         assertThat(all)
@@ -103,9 +95,7 @@ public class UserServiceIT {
 
     @Test
     public void should_find_user_approximately_by_prenom_in_index_and_retrieve_it() throws IOException, InterruptedException {
-        initIndex();
-        userIndexer.fillIndex();
-
+        userIndexer.indexUsers();
         final SearchResult<User> all = userService.getAll();
         assertThat(all)
                 .isNotNull();
@@ -124,13 +114,6 @@ public class UserServiceIT {
         assertThat(users).isNotEmpty()
                 .extracting(User::getPrenom)
                 .contains("Ruddy");
-    }
-
-    private void initIndex() throws InterruptedException, IOException {
-        if (indexService.indexExists(IndexName.USER)) {
-            indexService.deleteIndex(IndexName.USER);
-        }
-        indexService.createIndex(IndexName.USER, TypeName.USER);
     }
 
 }

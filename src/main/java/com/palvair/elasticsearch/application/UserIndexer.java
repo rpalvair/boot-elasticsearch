@@ -21,15 +21,27 @@ public class UserIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserIndexer.class);
     private final Client client;
     private final JdbcTemplate jdbcTemplate;
+    private final IndexService indexService;
 
     @Autowired
     public UserIndexer(final Client client,
-                       final JdbcTemplate jdbcTemplate) {
+                       final JdbcTemplate jdbcTemplate,
+                       final IndexService indexService) {
         this.client = client;
         this.jdbcTemplate = jdbcTemplate;
+        this.indexService = indexService;
     }
 
-    public void fillIndex() {
+
+    public void indexUsers() {
+        try {
+            if (indexService.indexExists(IndexName.USER)) {
+                indexService.deleteIndex(IndexName.USER);
+            }
+            indexService.createIndex(IndexName.USER, TypeName.USER);
+        } catch (final IOException | InterruptedException ex) {
+            LOGGER.error(ex.getMessage());
+        }
         final String sql = "SELECT users.nom," +
                 " users.prenom " +
                 " FROM users";

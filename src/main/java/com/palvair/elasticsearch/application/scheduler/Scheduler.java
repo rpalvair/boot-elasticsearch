@@ -1,8 +1,5 @@
 package com.palvair.elasticsearch.application.scheduler;
 
-import com.palvair.elasticsearch.application.IndexName;
-import com.palvair.elasticsearch.application.IndexService;
-import com.palvair.elasticsearch.application.TypeName;
 import com.palvair.elasticsearch.application.UserIndexer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +14,10 @@ public class Scheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Scheduler.class);
 
-    private final IndexService indexService;
     private final UserIndexer userIndexer;
 
     @Autowired
-    public Scheduler(final IndexService indexService,
-                     final UserIndexer userIndexer) {
-        this.indexService = indexService;
+    public Scheduler(final UserIndexer userIndexer) {
         this.userIndexer = userIndexer;
     }
 
@@ -31,11 +25,7 @@ public class Scheduler {
     public void index() {
         LOGGER.info("Start indexing {}", LocalDateTime.now());
         try {
-            if (indexService.indexExists(IndexName.USER)) {
-                indexService.deleteIndex(IndexName.USER);
-            }
-            indexService.createIndex(IndexName.USER, TypeName.USER);
-            userIndexer.fillIndex();
+            userIndexer.indexUsers();
         } catch (final Exception e) {
             LOGGER.error(e.getMessage());
         }
