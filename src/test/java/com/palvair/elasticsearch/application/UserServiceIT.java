@@ -32,7 +32,7 @@ public class UserServiceIT {
 
 
     @Test
-    public void should_find_user_in_index_and_retrieve_it() throws IOException, InterruptedException {
+    public void should_find_user_by_name_in_index_and_retrieve_it() throws IOException, InterruptedException {
         initIndex();
         userIndexer.fillIndex();
 
@@ -51,6 +51,33 @@ public class UserServiceIT {
         assertThat(users).isNotEmpty()
                 .extracting(User::getNom)
                 .contains(nom);
+    }
+
+    @Test
+    public void should_find_user_by_prenom_in_index_and_retrieve_it() throws IOException, InterruptedException {
+        initIndex();
+        userIndexer.fillIndex();
+
+        final SearchResult<User> all = userService.getAll();
+        assertThat(all)
+                .isNotNull();
+        assertThat(all.getList())
+                .isNotEmpty()
+                .hasSize(1);
+
+        final String prenom = "Ruddy";
+        final SearchResult<User> searchResult = userService.find(prenom);
+
+        assertThat(searchResult).isNotNull();
+        final List<User> users = searchResult.getList();
+        assertThat(users).isNotEmpty()
+                .extracting(User::getPrenom)
+                .contains(prenom);
+
+        assertThat(users).isNotEmpty()
+                .extracting(User::getNom)
+                .contains("Palvair");
+
     }
 
     @Test

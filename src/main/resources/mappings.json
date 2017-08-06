@@ -13,7 +13,13 @@
       },
       "prenom": {
         "type": "string",
-        "analyzer": "keyword"
+        "analyzer": "keyword",
+        "fields": {
+          "autocomplete": {
+            "type": "string",
+            "analyzer": "autocomplete"
+          }
+        }
       }
     }
   }
