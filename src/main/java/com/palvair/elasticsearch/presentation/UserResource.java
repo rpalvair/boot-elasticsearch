@@ -57,7 +57,7 @@ public class UserResource {
                     .build();
         }
         return Response.ok(
-                userService.searchExactly(value)
+                userService.find(value)
         ).build();
     }
 }

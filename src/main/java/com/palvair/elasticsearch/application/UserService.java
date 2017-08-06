@@ -31,25 +31,12 @@ public class UserService {
         this.elasticsearchTemplate = elasticsearchTemplate;
     }
 
-    public SearchResult<User> searchExactly(final String value) {
+    public SearchResult<User> find(final String value) {
 
         final BoolQueryBuilder query = boolQuery().must(
                 boolQuery().should(matchQuery("nom", value))
                         .should(matchQuery("prenom", value))
-        );
-
-        final NativeSearchQuery builder = new NativeSearchQueryBuilder()
-                .withIndices(IndexName.USER.getName())
-                .withTypes(TypeName.USER.getName())
-                .withQuery(query).build();
-
-        return elasticsearchTemplate.query(builder, this::extractResults);
-    }
-
-    public SearchResult<User> searchApproximately(final String value) {
-
-        final BoolQueryBuilder query = boolQuery().must(
-                boolQuery().should(matchQuery("nom.autocomplete", value).analyzer("query_autocomplete"))
+                        .should(matchQuery("nom.autocomplete", value).analyzer("query_autocomplete"))
         );
 
         final NativeSearchQuery builder = new NativeSearchQueryBuilder()

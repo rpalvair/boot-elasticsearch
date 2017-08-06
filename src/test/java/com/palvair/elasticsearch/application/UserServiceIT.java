@@ -44,7 +44,7 @@ public class UserServiceIT {
                 .hasSize(1);
 
         final String nom = "Palvair";
-        final SearchResult<User> searchResult = userService.searchExactly(nom);
+        final SearchResult<User> searchResult = userService.find(nom);
 
         assertThat(searchResult).isNotNull();
         final List<User> users = searchResult.getList();
@@ -65,7 +65,7 @@ public class UserServiceIT {
                 .isNotEmpty()
                 .hasSize(1);
 
-        final SearchResult<User> searchResult = userService.searchApproximately("pal");
+        final SearchResult<User> searchResult = userService.find("pal");
 
         assertThat(searchResult).isNotNull();
         final List<User> users = searchResult.getList();
