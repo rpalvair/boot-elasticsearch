@@ -1,7 +1,5 @@
 package com.palvair.elasticsearch.application;
 
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.client.Client;
 import org.slf4j.Logger;
@@ -31,25 +29,20 @@ public class IndexService {
         final String mapping = new String(Files.readAllBytes(Paths.get(mappingsUri)));
         final URI settingsUri = new ClassPathResource("settings.json").getURI();
         final String setting = new String(Files.readAllBytes(Paths.get(settingsUri)));
-        final CreateIndexResponse createIndexResponse = client.admin()
+        client.admin()
                 .indices()
                 .prepareCreate(indexName.getName())
                 .addMapping(typeName.getName(), mapping)
                 .setSettings(setting)
                 .get();
-
-        LOGGER.debug("response = {}", createIndexResponse);
         LOGGER.debug("Indice {} created", indexName.getName());
     }
 
-    public void clear(final IndexName indexName) throws InterruptedException {
-        final DeleteIndexResponse deleteIndexResponse = client.admin()
+    public void deleteIndex(final IndexName indexName) throws InterruptedException {
+        client.admin()
                 .indices()
                 .prepareDelete(indexName.getName())
                 .get();
-
-        LOGGER.debug("response {}", deleteIndexResponse);
-
         LOGGER.debug("Indice {} deleted", indexName.getName());
     }
 

@@ -31,11 +31,7 @@ public class UserServiceIT {
 
     @Test
     public void should_find_user_in_index_and_retrieve_it() throws IOException, InterruptedException {
-        if (indexService.indexExists(IndexName.USER)) {
-            indexService.clear(IndexName.USER);
-        }
-
-        indexService.createIndex(IndexName.USER, TypeName.USER);
+        initIndex();
 
         final String nom = "palvair";
         userIndexer.addUser(new User(nom, "ruddy"));
@@ -58,11 +54,7 @@ public class UserServiceIT {
 
     @Test
     public void should_find_user_approximately_by_nom_in_index_and_retrieve_it() throws IOException, InterruptedException {
-        if (indexService.indexExists(IndexName.USER)) {
-            indexService.clear(IndexName.USER);
-        }
-
-        indexService.createIndex(IndexName.USER, TypeName.USER);
+        initIndex();
 
         final String nom = "palvair";
         userIndexer.addUser(new User(nom, "ruddy"));
@@ -81,6 +73,13 @@ public class UserServiceIT {
         assertThat(users).isNotEmpty()
                 .extracting(User::getNom)
                 .contains(nom);
+    }
+
+    private void initIndex() throws InterruptedException, IOException {
+        if (indexService.indexExists(IndexName.USER)) {
+            indexService.deleteIndex(IndexName.USER);
+        }
+        indexService.createIndex(IndexName.USER, TypeName.USER);
     }
 
 }

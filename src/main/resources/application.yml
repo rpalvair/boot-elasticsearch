@@ -14,9 +14,14 @@ eureka:
 spring:
   application:
     name: elasticsearch
+    #data:
+      #elasticsearch:
+        #cluster-nodes: http://localhost:9200
+        #cluster-name: service-recherche
+
 
 cxf:
-  path: /api
+  path: /recherche
   jaxrs:
     component-scan: true
     classes-scan-packages: com.palvair.elasticsearch.presentation
