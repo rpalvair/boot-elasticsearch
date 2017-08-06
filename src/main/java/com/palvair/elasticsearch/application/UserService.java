@@ -37,6 +37,7 @@ public class UserService {
                 boolQuery().should(matchQuery("nom", value))
                         .should(matchQuery("prenom", value))
                         .should(matchQuery("nom.autocomplete", value).analyzer("query_autocomplete"))
+                        .should(matchQuery("prenom.autocomplete", value).analyzer("query_autocomplete"))
         );
 
         final NativeSearchQuery builder = new NativeSearchQueryBuilder()

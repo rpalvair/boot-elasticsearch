@@ -101,6 +101,31 @@ public class UserServiceIT {
                 .contains("Palvair");
     }
 
+    @Test
+    public void should_find_user_approximately_by_prenom_in_index_and_retrieve_it() throws IOException, InterruptedException {
+        initIndex();
+        userIndexer.fillIndex();
+
+        final SearchResult<User> all = userService.getAll();
+        assertThat(all)
+                .isNotNull();
+        assertThat(all.getList())
+                .isNotEmpty()
+                .hasSize(1);
+
+        final SearchResult<User> searchResult = userService.find("rud");
+
+        assertThat(searchResult).isNotNull();
+        final List<User> users = searchResult.getList();
+        assertThat(users).isNotEmpty()
+                .extracting(User::getNom)
+                .contains("Palvair");
+
+        assertThat(users).isNotEmpty()
+                .extracting(User::getPrenom)
+                .contains("Ruddy");
+    }
+
     private void initIndex() throws InterruptedException, IOException {
         if (indexService.indexExists(IndexName.USER)) {
             indexService.deleteIndex(IndexName.USER);
