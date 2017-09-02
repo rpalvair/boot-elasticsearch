@@ -31,6 +31,15 @@ public class UserIndexer {
     }
 
 
+    public boolean refreshIndex() {
+        //TODO : créer le nouvel index avec un nouvel alias
+        //TODO : mettre à jour le nouvel index avec les données de la base
+        //TODO : assigné le bon alias(user) au nouvel index une fois le refresh terminé et changer l'alias du vieil index
+        //TODO : supprimer le vieil index
+
+        return false;
+    }
+
     public void indexUsers() {
         if (indexService.indexExists(IndexName.USER)) {
             indexService.deleteIndex(IndexName.USER);
