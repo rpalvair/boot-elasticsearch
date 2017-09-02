@@ -7,11 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class IndexService {
@@ -24,26 +23,44 @@ public class IndexService {
         this.client = client;
     }
 
-    public void createIndex(final IndexName indexName, final TypeName typeName) throws IOException, InterruptedException {
-        final URI mappingsUri = new ClassPathResource("mappings.json").getURI();
-        final String mapping = new String(Files.readAllBytes(Paths.get(mappingsUri)));
-        final URI settingsUri = new ClassPathResource("settings.json").getURI();
-        final String setting = new String(Files.readAllBytes(Paths.get(settingsUri)));
-        client.admin()
-                .indices()
-                .prepareCreate(indexName.getName())
-                .addMapping(typeName.getName(), mapping)
-                .setSettings(setting)
-                .get();
-        LOGGER.debug("Indice {} created", indexName.getName());
+    public void createIndex(final IndexName indexName, final TypeName typeName) {
+        try {
+            final String mapping = getContent("mappings.json");
+            final String setting = getContent("settings.json");
+            client.admin()
+                    .indices()
+                    .prepareCreate(indexName.getName())
+                    .addMapping(typeName.getName(), mapping)
+                    .setSettings(setting)
+                    .execute();
+            LOGGER.debug("Index {} created", indexName.getName());
+        } catch (final Exception exception) {
+            LOGGER.error("Error while creating index", exception);
+        }
     }
 
-    public void deleteIndex(final IndexName indexName) throws InterruptedException {
-        client.admin()
-                .indices()
-                .prepareDelete(indexName.getName())
-                .get();
-        LOGGER.debug("Indice {} deleted", indexName.getName());
+    private String getContent(final String fileName) {
+        final ClassPathResource classPathResource = new ClassPathResource(fileName);
+        try {
+            byte[] byteArray = FileCopyUtils.copyToByteArray(classPathResource.getInputStream());
+            return new String(byteArray, StandardCharsets.UTF_8);
+        } catch (final IOException exception) {
+            LOGGER.warn("Error while reading file content {}", fileName, exception);
+            return null;
+        }
+    }
+
+    public void deleteIndex(final IndexName indexName) {
+        try {
+            client.admin()
+                    .indices()
+                    .prepareDelete(indexName.getName())
+                    .execute();
+            LOGGER.debug("Index {} deleted", indexName.getName());
+        } catch (final Exception exception) {
+            LOGGER.error("Error while deleting index", exception);
+        }
+
     }
 
     public boolean indexExists(final IndexName indexName) {
