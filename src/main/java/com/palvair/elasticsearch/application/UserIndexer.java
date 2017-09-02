@@ -1,17 +1,15 @@
 package com.palvair.elasticsearch.application;
 
 import com.palvair.elasticsearch.domain.User;
+import com.palvair.elasticsearch.domain.UserRepository;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
@@ -20,39 +18,26 @@ public class UserIndexer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserIndexer.class);
     private final Client client;
-    private final JdbcTemplate jdbcTemplate;
     private final IndexService indexService;
+    private final UserRepository userRepository;
 
     @Autowired
     public UserIndexer(final Client client,
-                       final JdbcTemplate jdbcTemplate,
-                       final IndexService indexService) {
+                       final IndexService indexService,
+                       final UserRepository jdbcUserRepository) {
         this.client = client;
-        this.jdbcTemplate = jdbcTemplate;
         this.indexService = indexService;
+        this.userRepository = jdbcUserRepository;
     }
 
 
     public void indexUsers() {
-        try {
-            if (indexService.indexExists(IndexName.USER)) {
-                indexService.deleteIndex(IndexName.USER);
-            }
-            indexService.createIndex(IndexName.USER, TypeName.USER);
-        } catch (final IOException | InterruptedException ex) {
-            LOGGER.error(ex.getMessage());
+        if (indexService.indexExists(IndexName.USER)) {
+            indexService.deleteIndex(IndexName.USER);
         }
-        final String sql = "SELECT users.nom," +
-                " users.prenom " +
-                " FROM users";
-
-        jdbcTemplate.query(sql, this::mapUser)
+        indexService.createIndex(IndexName.USER, TypeName.USER);
+        userRepository.findAll()
                 .forEach(this::addUser);
-    }
-
-    private User mapUser(final ResultSet resultSet, final int i) throws SQLException {
-        return new User(resultSet.getString("nom"),
-                resultSet.getString("prenom"));
     }
 
     private void addUser(final User user) {
@@ -72,8 +57,8 @@ public class UserIndexer {
                     .prepareRefresh()
                     .get();
 
-        } catch (final IOException ex) {
-            LOGGER.error(ex.getMessage());
+        } catch (final IOException exception) {
+            LOGGER.error("Error while adding user {}", user, exception);
         }
 
     }
