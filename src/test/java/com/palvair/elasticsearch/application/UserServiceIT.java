@@ -3,6 +3,7 @@ package com.palvair.elasticsearch.application;
 import com.palvair.elasticsearch.domain.User;
 import com.palvair.elasticsearch.infrastructure.Application;
 import com.palvair.elasticsearch.presentation.SearchResult;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class}, webEnvironment = NONE)
 @ActiveProfiles("test")
+@Ignore
 public class UserServiceIT {
 
     @Autowired
