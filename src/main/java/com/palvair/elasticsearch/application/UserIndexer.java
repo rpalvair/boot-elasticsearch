@@ -2,7 +2,6 @@ package com.palvair.elasticsearch.application;
 
 import com.palvair.elasticsearch.domain.User;
 import com.palvair.elasticsearch.domain.UserRepository;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,55 +16,53 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 public class UserIndexer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserIndexer.class);
-    private final Client client;
     private final IndexService indexService;
     private final UserRepository userRepository;
 
     @Autowired
-    public UserIndexer(final Client client,
-                       final IndexService indexService,
+    public UserIndexer(final IndexService indexService,
                        final UserRepository jdbcUserRepository) {
-        this.client = client;
         this.indexService = indexService;
         this.userRepository = jdbcUserRepository;
     }
 
 
-    public boolean refreshIndex() {
-        //TODO : créer le nouvel index avec un nouvel alias
-        //TODO : mettre à jour le nouvel index avec les données de la base
-        //TODO : assigné le bon alias(user) au nouvel index une fois le refresh terminé et changer l'alias du vieil index
-        //TODO : supprimer le vieil index
-
-        return false;
-    }
-
-    public void indexUsers() {
-        if (indexService.indexExists(IndexName.USER)) {
-            indexService.deleteIndex(IndexName.USER);
-        }
-        indexService.createIndex(IndexName.USER, TypeName.USER);
+    //TODO : retourner index et alias
+    public String refreshIndex() {
+        final String alias = "user";
+        final String oldIndex = indexService.getFirstIndexFromAlias(alias);
+        final String newIndex = computeNewIndexName(oldIndex, alias);
+        indexService.createIndex(newIndex, "user");
         userRepository.findAll()
-                .forEach(this::addUser);
+                .forEach(user -> addUser(user, newIndex));
+        if (oldIndex != null) {
+            indexService.removeAlias(oldIndex, alias);
+            indexService.deleteIndex(oldIndex);
+        }
+        indexService.addAlias(newIndex, alias);
+        return newIndex;
     }
 
-    private void addUser(final User user) {
+
+    private String computeNewIndexName(final String oldIndex, final String index) {
+        if (oldIndex == null) {
+            return index + "_1";
+        }
+        final String indexWithoutVersion = oldIndex.substring(0, oldIndex.length() - 2);
+        if (oldIndex.endsWith("_1")) {
+            return indexWithoutVersion + "_2";
+        }
+        return indexWithoutVersion + "_1";
+    }
+
+    private void addUser(final User user, final String indexName) {
         try {
             final XContentBuilder json = jsonBuilder()
                     .startObject()
                     .field("prenom", user.getPrenom())
                     .field("nom", user.getNom())
                     .endObject();
-
-            client.prepareIndex(IndexName.USER.getName(), TypeName.USER.getName())
-                    .setSource(json)
-                    .get();
-
-            client.admin()
-                    .indices()
-                    .prepareRefresh()
-                    .get();
-
+            indexService.addContent(indexName, "user", json);
         } catch (final IOException exception) {
             LOGGER.error("Error while adding user {}", user, exception);
         }

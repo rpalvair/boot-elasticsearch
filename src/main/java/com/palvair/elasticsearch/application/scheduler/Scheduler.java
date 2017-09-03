@@ -21,11 +21,11 @@ public class Scheduler {
         this.userIndexer = userIndexer;
     }
 
-    @Scheduled(fixedDelay = 1000 * 60 * 60)
+    @Scheduled(fixedDelay = 1000 * 60)
     public void index() {
         LOGGER.info("Start indexing {}", LocalDateTime.now());
         try {
-            userIndexer.indexUsers();
+            userIndexer.refreshIndex();
         } catch (final Exception e) {
             LOGGER.error(e.getMessage());
         }
