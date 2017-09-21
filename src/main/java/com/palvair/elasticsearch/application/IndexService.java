@@ -1,6 +1,6 @@
 package com.palvair.elasticsearch.application;
 
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.metadata.AliasOrIndex;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -41,7 +41,7 @@ public class IndexService {
         return null;
     }
 
-    public void addContent(final String index, final String type, final XContentBuilder json) {
+    public boolean addContent(final String index, final String type, final XContentBuilder json) {
         client.prepareIndex(index, type)
                 .setSource(json)
                 .get();
@@ -50,13 +50,15 @@ public class IndexService {
                 .indices()
                 .prepareRefresh()
                 .get();
+
+        return true;
     }
 
-    public void createIndex(final String indexName, final String typeName) {
+    public boolean createIndex(final String indexName, final String typeName) {
         try {
             final String mapping = getContent("mappings.json");
             final String setting = getContent("settings.json");
-            client.admin()
+            final CreateIndexResponse createIndexResponse = client.admin()
                     .indices()
                     .prepareCreate(indexName)
                     .addMapping(typeName, mapping)
@@ -64,27 +66,29 @@ public class IndexService {
                     .execute()
                     .actionGet();
             LOGGER.debug("Index {} created", indexName);
+            return true;
         } catch (final Exception exception) {
             LOGGER.error("Error while creating index", exception);
+            return false;
         }
     }
 
-    public void addAlias(final String indexName, final String alias) {
-        client.admin()
+    public boolean addAlias(final String indexName, final String alias) {
+        return client.admin()
                 .indices()
                 .prepareAliases()
                 .addAlias(indexName, alias)
                 .execute()
-                .actionGet();
+                .actionGet().isAcknowledged();
     }
 
-    public void removeAlias(final String index, final String alias) {
-        client.admin()
+    public boolean removeAlias(final String index, final String alias) {
+        return client.admin()
                 .indices()
                 .prepareAliases()
                 .removeAlias(index, alias)
                 .execute()
-                .actionGet();
+                .actionGet().isAcknowledged();
     }
 
     private String getContent(final String fileName) {
@@ -98,7 +102,7 @@ public class IndexService {
         }
     }
 
-    public void deleteIndex(final String indexName) {
+    public boolean deleteIndex(final String indexName) {
         try {
             client.admin()
                     .indices()
@@ -106,9 +110,12 @@ public class IndexService {
                     .execute()
                     .actionGet();
             LOGGER.debug("Index {} deleted", indexName);
+            return true;
         } catch (final Exception exception) {
             LOGGER.error("Error while deleting index", exception);
+            return false;
         }
+
 
     }
 
