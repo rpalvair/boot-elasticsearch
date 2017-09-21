@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,7 +31,7 @@ public class UserServiceIT {
 
     @Test
     public void should_find_user_by_name_in_index_and_retrieve_it() throws IOException, InterruptedException {
-        userIndexer.indexUsers();
+        userIndexer.refreshIndex();
         final SearchResult<User> all = userService.getAll();
         assertThat(all)
                 .isNotNull();
@@ -52,7 +51,7 @@ public class UserServiceIT {
 
     @Test
     public void should_find_user_by_prenom_in_index_and_retrieve_it() throws IOException, InterruptedException {
-        userIndexer.indexUsers();
+        userIndexer.refreshIndex();
         final SearchResult<User> all = userService.getAll();
         assertThat(all)
                 .isNotNull();
@@ -77,7 +76,7 @@ public class UserServiceIT {
 
     @Test
     public void should_find_user_approximately_by_nom_in_index_and_retrieve_it() throws IOException, InterruptedException {
-        userIndexer.indexUsers();
+        userIndexer.refreshIndex();
 
         final SearchResult<User> all = userService.getAll();
         assertThat(all)
@@ -97,7 +96,7 @@ public class UserServiceIT {
 
     @Test
     public void should_find_user_approximately_by_prenom_in_index_and_retrieve_it() throws IOException, InterruptedException {
-        userIndexer.indexUsers();
+        userIndexer.refreshIndex();
         final SearchResult<User> all = userService.getAll();
         assertThat(all)
                 .isNotNull();
